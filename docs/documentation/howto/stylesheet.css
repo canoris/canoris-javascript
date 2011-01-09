@@ -1,0 +1,53 @@
+/* JSDoc style sheet */
+
+/* Define colors, fonts and other style attributes here to override the defaults */
+
+/* Page background color */
+body { background-color: #FFFFFF; font-size: 12pt; font-family: Helvetica, Arial, Verdana, san-serif; }
+
+a {color: #74721E; text-decoration: none;}
+#left {background-color: #F3F3F3}
+h2 {text-align: left; font-size: 16pt; font-family: Helvetica, Arial, Verdana, san-serif;}
+
+/* Head page */
+#logoHeader{ 	margin: 0; padding: 0;	background-image: url("bar.png"); background-repeat: repeat-x;   
+				color: #000000;	text-decoration: none;	line-height: 30px;	min-height: 114px;	border: 0px;
+				font-size: 12pt; font-family: Helvetica, Arial, Verdana, san-serif;}
+/* Table colors */
+pre { font-size: 11pt;} /*  font-family: Helvetica, Arial, Verdana, san-serif; }*/
+pre#code { background-color: #EFF3DA; border: 1px solid #656E24; color: #222222; line-height: 120%; padding: 5px; overflow: auto; }
+#codeExample{ bgcolor: #EFF3DA;border:1; cellpadding:3; cellspacing:0; width:100%;}
+	
+.TableNormal {border:1; cellpadding:3; cellspacing:0; width:100%;}
+
+.TableHeadingColor     { background: #CCCCCC; } /* Dark mauve */
+.TableSubHeadingColor  { background: #F3F3F3; } /* Light mauve */
+.TableRowColor         { background: #FFFFFF; } /* White */
+
+/* Font used in left-hand frame lists */
+.FrameTitleFont   { font-size: 12pt; font-family: Helvetica, Arial, Verdana, san-serif;}
+.FrameHeadingFont { font-size: 12pt; font-family: Helvetica, Arial, Verdana, san-serif;}
+.FrameItemFont    { font-size: 12pt; font-family: Helvetica, Arial, Verdana, san-serif;}
+
+/* Example of smaller, sans-serif font in frames */
+/* .FrameItemFont  { font-size: 10pt; font-family: Helvetica, Arial, sans-serif } */
+
+/* Navigation bar fonts and colors */
+.NavBarCell1    { background-color:#F3F3F3;}/* Light mauve */
+.NavBarCell1Rev { background-color:#CCCCCC;}/* Dark Blue */
+.NavBarFont1    { font-family: Helvetica, Arial, Verdana, sans-serif; color:#74721E;}
+.NavBarFont1Rev { font-family: Helvetica, Arial, Verdana, sans-serif; color:#FFFFFF;}
+
+.NavBarCell2    { font-family: Helvetica, Arial, Verdana, sans-serif; background-color:#FFFFFF;}
+.NavBarCell3    { font-family: Helvetica, Arial,Verdana, sans-serif; background-color:#FFFFFF;}
+
+.jsdoc_ctime    { font-family: Helvetica, Arial, Verdana, sans-serif; font-size: 9pt;color:#74721E;
+                    text-align: right }
+
+/* Sourcecode view */
+.sourceview { background: #FFFFFF }
+.attrib { color: #CCCCCC }
+.comment { color: #55AA55 }
+.reserved { color: #FF5555 }
+.literal { color: #5555FF }
+
