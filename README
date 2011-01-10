@@ -1,0 +1,11 @@
+CanorisLibJS is a javascript library for Canoris. Canoris delivers audio smarts
+to your web, mobile, and desktop applications. In depth analysis, similarity
+search, and voice processing.
+
+CanorisLibJS offers an easy communication in javascript with the Canoris API.
+The library exists out of a few classes in the namespace CAN. The user can use
+the functionality of these classes by instantiating a Canoris object. This
+object can be obtained by calling the constructor of the Canoris class. The
+Canoris object contains all necessary methods to get Files, Collections and
+Pagers. When a File, Collection or Pager is obtained, the user can use its
+prototype methods.
