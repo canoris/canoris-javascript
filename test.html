@@ -1,0 +1,234 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<title>Untitled Document</title>
+		<script type="text/javascript" src="jquery.js"></script>
+		<script type="text/javascript" src="jquery-jsonp.js"></script>
+		<script type="text/javascript" src="log4javascript.js"></script>
+		<script type="text/javascript" src="canorisLib.js"></script>
+		<link rel="stylesheet" type="text/css" href="qunit.css" />
+		<script type="text/javascript" src="qunit.js"></script>
+	</head>
+	<body>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				
+				//for the testing of the Pager class, more then 20 files need to be uploaded
+				//for the testing of the Collection and similarity, the collection at least needs to contain 31 files
+				var apiKey = "";//enter apiKey, see 2 lines above
+				var fileKey = ""; //enter fileKey, see 3 lines above
+				var collectionKey = ""; //enter collectionKey, see 4 lines above
+			
+			if(apiKey == "" && fileKey == "" && collectionKey == "")
+			{
+				$("#enterKeys").append(
+					"<br/><br/>" + 
+					"please enter apiKey, fileKey and collectionKey in source test.html" +
+					"<br/><br/><br/>"
+				);
+				
+			}			
+			/*======= canoris object ========*/
+				//creating canoris object
+				var canoris = new Canoris(apiKey, false, "ALL");
+				
+				//create canoris object test	
+				test("create canoris Object test", function(){
+						ok($.type(canoris) == "object", "Canoris object created succesfull");
+				});
+			
+			
+			/*======= File tests ========*/
+				module("File tests");
+				
+				canoris.getFile(fileKey, "file1", function(file){
+					
+					module("File tests");
+					//File.getFile test
+					test("File.getFile test", function() {
+						ok(	($.type(file) == "object" && file.properties),
+							"getFile test");
+					});
+					
+					//file.getAnalyses test
+					file.getAnalyses(1, ["highlevel","genre", "r"], function(analyses){
+						module("File tests");
+						test("file.getAnalyses test the test", function(){
+							ok($.type(analyses) == "object" && analyses.all && analyses.all.classical, 
+								"file.getAnalyses passed the test");
+						});
+					}); 
+					 
+					
+					//file.getFileUrl test
+					module("File tests");
+					test("file.getFileUrl test", function(){
+						ok(file.getFileUrl() == 
+							"http://api.canoris.com/files/"+ fileKey + "/serve?&api_key=" + apiKey + "&format=json", 
+						"file.getFileUrl passed the test");
+								
+					})
+					
+					//file.getVisualisations & file.getVisualisationUrl test
+					file.getVisualisations(function(visualisations){
+						module("File tests");
+						test("file.getVisualisations test & file.getVisualisationUrl", function(){
+							ok(	$.type(visualisations) == "object" && visualisations.waveform && visualisations.spectrum, 
+								"file.getVisualisations passed the test"	);
+							ok( file.getVisualisationUrl("spectrum") == 
+									"http://api.canoris.com/files/" + fileKey + "/visualizations/spectrum?&api_key=" + apiKey + "&format=json",
+								"file.getVisualisations passed the test")							
+						})
+					});
+					//file.getConversions & file.getConversionUrl test
+					file.getConversions(function(conversions){
+						module("File tests");
+						test("file.getConversions & file.getConversionUrl test", function(){
+							ok($.type(conversions) == "object" && conversions.mp3_128kb && conversions.mp3_64kb &&
+								conversions.ogg && conversions.wave_44100, 
+								"file.getConversions passed the test");
+							ok( file.getConversionUrl("wave_44100") == 
+									"http://api.canoris.com/files/" + fileKey + "/conversions/wave_44100?&api_key=" + apiKey + "&format=json", 
+								"file.getConvserionUrl passed the test");
+						});		
+					});
+					
+				});
+				
+			/*======= Collection tests ========*/
+			//Collection.getCollection test				
+				canoris.getCollection(collectionKey, "collection1", function(collection){
+					module("Collection tests");
+					test("Collection.getCollection test", function() {
+						ok(	($.type(collection) == "object" && collection.properties),
+							"getcollection test");
+					});
+					
+					//collection.getFiles test
+					collection.getFiles(1, function(page){
+						module("Collection tests");
+						test("collection.getFiles test", function(){
+							ok($.type(page)=="object" && page.ref && page.files, 
+							"collection.getFiles test");
+						});
+					}) 
+					
+					//collection.getSimilar
+					collection.getSimilar(fileKey, "music", 5, function(similar){
+						module("Collection tests");
+						test("collection.getSimilar test", function(){
+							ok($.type(similar) == "array" && similar.length == 5,
+							"collection.getSimilar test")
+						});
+					});
+					
+					//collection.getItem (function from CanorisObject class, collection extends this class)
+					test("collection.getItem test", function(){
+						ok($.type(collection.getItem("name") == "string"), 
+						"collection.getItem method passed test");
+					});
+					
+					//collection.key (function from CanorisObject class, collection extends this class)
+					test("collection.key test", function(){
+						ok(collection.key() == collectionKey, 
+						"collection.key method passed test");
+					});
+				})
+				
+			/*======= Pager tests ========*/		
+				//Pager.getFilesPager test
+				canoris.getFilesPager("myFilePager", 1, function(pager){
+					module("Pager tests");
+					test("Pager.getFilesPager test", function(){
+						ok($.type(pager) == "object" && $.type(pager.getTotal) == "function" &&	
+							!isNaN(pager.getTotal()) && pager.properties.previous,  
+							"Pager.getFilesPager test");
+					});
+					
+					//pager.previous test
+					pager.previous(function(pager){
+						module("Pager tests");
+						test("pager.previous test", function(){
+							ok($.type(pager) == "object" && $.type(pager.getTotal) == "function" &&	
+								!isNaN(pager.getTotal()) && pager.properties.next,  
+								"pager.previous test");
+						});
+						//pager.next test
+						pager.next(function(pager){
+							module("Pager tests");
+							test("pager.next test", function(){
+								ok($.type(pager) == "object" && $.type(pager.getTotal) == "function" &&	
+									!isNaN(pager.getTotal()) && pager.properties.previous,  
+									"pager.next test");
+							});
+						
+							//pager.update test
+							pager.update(function(pager){
+								module("Pager tests");
+								test("pager.update test", function(){
+									ok($.type(pager) == "object" && $.type(pager.getTotal) == "function" &&	
+										!isNaN(pager.getTotal()) && pager.properties.previous,  
+										"pager.update test");
+								});
+							});
+						});	
+					});	
+					
+				});
+				
+				//Pager.getCollectionsPager test
+				canoris.getCollectionsPager("myCollectionsPager", 1, function(pager){
+					module("Pager tests");
+					test("Pager.myCollectionsPager test", function(){
+						ok($.type(pager) == "object" && $.type(pager.getTotal) == "function" &&	
+							!isNaN(pager.getTotal()) && pager.properties.previous,  
+							"Pager.myCollectionsPager test");
+					});
+				});
+					
+				//Pager.getCollectionFilesPager test
+				canoris.getCollectionFilesPager(collectionKey, "myCollectionFilesPager", 1, function(pager){
+					module("Pager tests");
+					test("Pager.getCollectionFilesPager test", function(){
+						ok($.type(pager) == "object" && $.type(pager.getTotal) == "function" &&	
+							!isNaN(pager.getTotal()) && pager.properties.previous,  
+							"Pager.getCollectionFilesPager test");
+					});
+				});
+				
+				//Text2Phonemes.text2phonemes test
+				canoris.text2phonemes("Canoris", function(phonemes){
+					module("Test2Phonemes test");
+					test("Text2Phonemes.text2phonemes test", function(){
+						ok( phonemes.text == "Canoris" && phonemes.phonemes[0][0][0] == "k", 
+							"Text2Phonemes.text2phonemes test");
+					});
+				});
+				
+			//renew class documentation
+			//upload class documentation
+			//copy cnaoris lib to Visual
+			// upload to git assembla
+			// upload to github
+			// mail Vincent about personal key etc.										
+			});
+		</script>
+		
+		<h1 id="qunit-header">Test CanorisLibJs</h1>
+	 	<h2 id="qunit-banner"></h2>
+		<div id="qunit-testrunner-toolbar"></div>
+		<h2 id="qunit-userAgent"></h2>
+		<ol id="qunit-tests"></ol>
+ 		<div id="qunit-fixture">test markup, will be hidden</div>
+		<br/>
+		<div id="enterKeys" 
+			style=
+				'font-family: "Helvetica Neue Light", "HelveticaNeue-Light", "Helvetica Neue", Calibri, Helvetica, Arial;
+				 color: red; background-color: black; text-align: center '
+				 
+			
+		></div>
+		
+	</body>
+</html>

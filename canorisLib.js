@@ -366,13 +366,14 @@ CAN.CanorisObject.prototype.update = function(succesCallback, errorCallback){
 		//save this (file, collection, pager, that is calling the update method) inside var object	
 		var object = this;
 		//create clossure around object, with which properties can be set 
+		//and return object, to be able to pass it to callback method		
 		var setProps = new function(props){
-		return function(props){ object.properties = props;}
+		return function(props){ object.properties = props; return object}
 		}
 		//call createGetReq method, use above setProps method in callback method to be able to save properties
 		CAN.RequestCreator.createGetReq(uriAndParams[0], function(inProperties){
-			setProps(inProperties);
-			if($.isFunction(succesCallback)){succesCallback(inProperties); };
+			var obj = setProps(inProperties);
+			if($.isFunction(succesCallback)){succesCallback(obj); };
 		}, errorCallback, uriAndParams[1]);	
 		this.properties = false; 	
 	}else{ throw new Error("properties of object does not exist, unable to update because no ref. is present");};
@@ -500,13 +501,14 @@ CAN.Pager.prototype.prevNext = function(uri, succesCallback, errorCallback){
 	//save this in object var
 	var object = this;
 	//create clossure around object, with which properties can be set 
+	//and return object, to be able to pass it to callback method
 	var setProps = new function(props){
-		return function(props){ object.properties = props;}
-	}	
+		return function(props){object.properties = props; return object;}
+	}; 
 	//call createGetReq method, use above setProps method in callback method to be able to save properties	
 	CAN.RequestCreator.createGetReq(uriAndParams[0], function(inProperties){
-		setProps(inProperties);
-		if($.isFunction(succesCallback)){succesCallback(inProperties); };
+		var obj = setProps(inProperties);
+		if($.isFunction(succesCallback)){succesCallback(obj); };
 	}, errorCallback, uriAndParams[1]);	 	
 	this.properties = false;
 }
@@ -568,8 +570,7 @@ CAN.File.getFile = function(fKey, saveFile, succesCallback, errorCallback){
 /**
  * Get analyses of File object and pass these to the passed callback method 
  * @param {int} showAll Contains 0 or 1. 0 -> get recommended descriptors, if 1 -> get all descriptors
- * @param {array} filter Contains Strings that contain names of wanted descriptor, to get corresponding analyses. 
-   See <a href="http://docs.canoris.com/howto_analysis.html" target="_blank">canoris_doc - howto_analysis</a>.
+ * @param {array} filter Contains Strings that contain names of wanted descriptor, to get corresponding analyses. See <a href="http://docs.canoris.com/howto_analysis.html" target="_blank">canoris_doc - howto_analysis</a>.
  * @param {function} succesCallback Will be called when the request succeeds.
  * @param {fucntion} errorCallback Will be called when the request fails
  * (no XMLHttpRequest and specified error passed to errorCallback with use of jsonp)
@@ -746,7 +747,7 @@ CAN.Text2Phonemes = function(){}
  */
 CAN.Text2Phonemes.translate = function(text, succesCallback, errorCallback, voice, language){
 	//check if text and callback are passed
-	if(!text || !callback){throw "No text and/or callback passed to Text2Phonemes.translate method."};
+	if(!text || !succesCallback){throw "No text and/or callback passed to Text2Phonemes.translate method."};
 	//if no parameter is passed for languages -> set to 'spanish'
 	if(!language){language = 'spanish'};
 	var params = {language: language, text: text};
