@@ -9,29 +9,31 @@
 		<script type="text/javascript" src="canorisLib.js"></script>
 		<link rel="stylesheet" type="text/css" href="qunit.css" />
 		<script type="text/javascript" src="qunit.js"></script>
+		<script type="text/javascript" src="settings.js"></script>
 	</head>
 	<body>
 		<script type="text/javascript">
 			$(document).ready(function(){
 				
-				//for the testing of the Pager class, more then 20 files need to be uploaded
-				//for the testing of the Collection and similarity, the collection at least needs to contain 31 files
-				var apiKey = "";//enter apiKey, see 2 lines above
-				var fileKey = ""; //enter fileKey, see 3 lines above
-				var collectionKey = ""; //enter collectionKey, see 4 lines above
-			
+			loadSettings();	
 			if(apiKey == "" && fileKey == "" && collectionKey == "")
 			{
 				$("#enterKeys").append(
 					"<br/><br/>" + 
-					"please enter apiKey, fileKey and collectionKey in source test.html" +
+					"please enter apiKey, fileKey and collectionKey in settings_local.js" +
 					"<br/><br/><br/>"
 				);
 				
 			}			
+			else {
 			/*======= canoris object ========*/
 				//creating canoris object
 				var canoris = new Canoris(apiKey, false, "ALL");
+			
+			
+				
+			
+			
 				
 				//create canoris object test	
 				test("create canoris Object test", function(){
@@ -138,7 +140,7 @@
 				
 			/*======= Pager tests ========*/		
 				//Pager.getFilesPager test
-				canoris.getFilesPager("myFilePager", 1, function(pager){
+				canoris.getFilesPager("myFilePager", 1, 10, function(pager){
 					module("Pager tests");
 					test("Pager.getFilesPager test", function(){
 						ok($.type(pager) == "object" && $.type(pager.getTotal) == "function" &&	
@@ -178,7 +180,7 @@
 				});
 				
 				//Pager.getCollectionsPager test
-				canoris.getCollectionsPager("myCollectionsPager", 1, function(pager){
+				canoris.getCollectionsPager("myCollectionsPager", 1,10, function(pager){
 					module("Pager tests");
 					test("Pager.myCollectionsPager test", function(){
 						ok($.type(pager) == "object" && $.type(pager.getTotal) == "function" &&	
@@ -188,7 +190,7 @@
 				});
 					
 				//Pager.getCollectionFilesPager test
-				canoris.getCollectionFilesPager(collectionKey, "myCollectionFilesPager", 1, function(pager){
+				canoris.getCollectionFilesPager(collectionKey, "myCollectionFilesPager", 1, 10, function(pager){
 					module("Pager tests");
 					test("Pager.getCollectionFilesPager test", function(){
 						ok($.type(pager) == "object" && $.type(pager.getTotal) == "function" &&	
@@ -205,7 +207,9 @@
 							"Text2Phonemes.text2phonemes test");
 					});
 				});
+			}
 			});
+		
 		</script>
 		
 		<h1 id="qunit-header">Test CanorisLibJs</h1>
@@ -225,4 +229,3 @@
 		
 	</body>
 </html>
-7
