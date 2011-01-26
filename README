@@ -9,3 +9,5 @@ object can be obtained by calling the constructor of the Canoris class. The
 Canoris object contains all necessary methods to get Files, Collections and
 Pagers. When a File, Collection or Pager is obtained, the user can use its
 prototype methods.
+
+version 0.10
