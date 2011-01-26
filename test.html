@@ -9,16 +9,13 @@
 		<script type="text/javascript" src="canorisLib.js"></script>
 		<link rel="stylesheet" type="text/css" href="qunit.css" />
 		<script type="text/javascript" src="qunit.js"></script>
+		<script type="text/javascript" src="settings.js"></script>
 	</head>
 	<body>
 		<script type="text/javascript">
-			$(document).ready(function(){
+		$(document).ready(function(){
 				
-				//for the testing of the Pager class, more then 20 files need to be uploaded
-				//for the testing of the Collection and similarity, the collection at least needs to contain 31 files
-				var apiKey = "";//enter apiKey, see 2 lines above
-				var fileKey = ""; //enter fileKey, see 3 lines above
-				var collectionKey = ""; //enter collectionKey, see 4 lines above
+			loadSettings();
 			
 			if(apiKey == "" && fileKey == "" && collectionKey == "")
 			{
@@ -29,6 +26,8 @@
 				);
 				
 			}			
+			else{
+				
 			/*======= canoris object ========*/
 				//creating canoris object
 				var canoris = new Canoris(apiKey, false, "ALL");
@@ -205,7 +204,8 @@
 							"Text2Phonemes.text2phonemes test");
 					});
 				});
-			});
+			}
+		});
 		</script>
 		
 		<h1 id="qunit-header">Test CanorisLibJs</h1>
@@ -225,4 +225,3 @@
 		
 	</body>
 </html>
-7
