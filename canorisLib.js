@@ -14,6 +14,7 @@ var CAN = new function()
 	this._URI_FILE = '/files/<file_key>';
 	this._URI_FILE_SERVE = '/files/<file_key>/serve';
 	this._URI_FILE_ANALYSIS = '/files/<file_key>/analysis/<filter>';
+	this._URI_FILE_ANALYSIS_FRAMES = '/files/<file_key>/analysis_frames/<filter>';
 	this._URI_FILE_CONVERSIONS = '/files/<file_key>/conversions';
 	this._URI_FILE_CONVERSION = '/files/<file_key>/conversions/<conversion>';
 	this._URI_FILE_VISUALIZATIONS = '/files/<file_key>/visualizations';
@@ -160,7 +161,7 @@ var CAN = new function()
  */
 CAN.CanorisData = function(){};
 CAN.CanorisData.apiKey = false;
-CAN.CanorisData.baseUri = 'http://api-test.canoris.com';
+CAN.CanorisData.baseUri = 'http://api.canoris.com';
 
 /**
  * Set Api key method, checks if handed api_key exists and saves this to CanorisData.api_key
@@ -219,7 +220,7 @@ CAN.RequestCreator.useJson = false;
 /**
  * Set timeout method.
  * @static
- * @param {number} tOut Used for jsonp requests timeout time.
+ * @param {Number} tOut Used for jsonp requests timeout time.
  */
 CAN.RequestCreator.setTimeout = function(tOut){
 	if(!isNaN(tOut)){ CAN.RequestCreator.timeout = tOut; };
@@ -249,7 +250,7 @@ CAN.RequestCreator.standardErrorMethod = function(XMLHttpRequest, textStatus, er
 						"\nerror of Request =  " + textStatus +	"\nthrown error =  " + errorThrown); 
 	CAN.Log.log.error( "Request failed, request = \n" + CAN.Log.showObject(XMLHttpRequest) + 
 						"\nerror of Request =  " + textStatus + "\nthrown error =  " + errorThrown); 
-	throw new Error("RequestCreator error " + textStatus);
+	throw new Error("RequestCreator error, request didn't succeed. " + errorThrown);
 };
 
 /**
@@ -283,6 +284,7 @@ CAN.RequestCreator.createGetReq = function(uri, succesCallback, errorCallback, p
 			errorCallback(XMLHttpRequest, textStatus, errorThrown);
 		};
 	}; 
+	
 	//check with wich type of json the request needs to be made
 	if(CAN.RequestCreator.useJson){
 		//send a json XMLHttpRequest 
@@ -296,14 +298,22 @@ CAN.RequestCreator.createGetReq = function(uri, succesCallback, errorCallback, p
 		});
 		
 	} else{
+		
+		$.ajax({
+			url: uri,
+			dataType: 'jsonp',
+			data: dataParams,
+			success: succesCallback,
+			type: 'GET'
+		});
 		//send a jsonp request
-		$.jsonp({
+		/*$.jsonp({
 			url: uri + "?callback=?",
 			data: dataParams,
 			timeout: CAN.RequestCreator.timeout,
 			success: succesCallback,
 			error: errorCallback
-		});
+		});*/
 	}
 }	
 
@@ -387,18 +397,19 @@ CAN.CanorisObject.prototype.update = function(succesCallback, errorCallback){
  * @class Pager class, is used to get a page of files or collections 
  * @constructor
  * @augments CAN.CanorisObject
+ * @param {int} limit Contains the limit for the nr of items on one page
  */
 CAN.Pager = function(limit){
 	this.object = this;
 	this.limit = limit;
-	console.debug(limit);
 }
 
 /**
  * Creates a files Pager object, saves it with passed pager-save function
  * @static 
  * @param {function} savePage Is used to save the created Pager object.
- * @param {number} pageNr The nr of the page to letwhere the pager needs to point to. 
+ * @param {int} pageNr The nr of the page to letwhere the pager needs to point to. 
+ * @param {int} limit Contains the limit for the nr of items on one page
  * @param {function} succesCallback Will be called when the request succeeds.
  * @param {fucntion} errorCallback Will be called when the request fails 
  * (no XMLHttpRequest and specified error passed to errorCallback with use of jsonp)
@@ -411,7 +422,8 @@ CAN.Pager.getFilesPager = function(savePager, pageNr, limit, succesCallback, err
  * Creates a collections Pager object, saves it with passed pager-save function
  * @static
  * @param {function} savePage Is used to save the created Pager object
- * @param {number} pageNr The nr of the page where the pager needs to point to.  
+ * @param {int} pageNr The nr of the page where the pager needs to point to.
+ * @param {int} limit Contains the limit for the nr of items on one page  
  * @param {function} succesCallback Will be called when the request succeeds.
  * @param {fucntion} errorCallback Will be called when the request fails 
  * (no XMLHttpRequest and specified error passed to errorCallback with use of jsonp)
@@ -425,7 +437,8 @@ CAN.Pager.getCollectionsPager = function(savePager, pageNr, limit, succesCallbac
  * @static
  * @param {string} cKey Contains a collection key.
  * @param {Object} savePager Is used to save the created Pager object
- * @param {Number} pageNr The nr of the page where the pager needs to point to. 
+ * @param {int} pageNr The nr of the page where the pager needs to point to. 
+ * @param {int} limit Contains the limit for the nr of items on one page
  * @param {function} succesCallback Will be called when the request succeeds.
  * @param {fucntion} errorCallback Will be called when the request fails
  * (no XMLHttpRequest and specified error passed to errorCallback with use of jsonp)
@@ -439,7 +452,8 @@ CAN.Pager.getCollectionFilesPager = function(cKey, savePager, pageNr, limit, suc
  * @static
  * @param {string} uri Contains the uri for the request.
  * @param {Object} savePage Is used to save the created Pager object
- * @param {Number} pageNr The nr of the page to let the pager point to.  
+ * @param {int} pageNr The nr of the page to let the pager point to.  
+ * @param {int} limit Contains the limit for the nr of items on one page
  * @param {function} succesCallback Will be called when the request succeeds.
  * @param {fucntion} errorCallback Will be called when the request fails
  * (no XMLHttpRequest and specified error passed to errorCallback with use of jsonp)
@@ -452,15 +466,15 @@ CAN.Pager.createPager = function(uri, savePager, pageNr, limit, succesCallback, 
 	//create Request
 	CAN.RequestCreator.createGetReq(uri, function(inProperties){
 		//create a new Pager object and a new CanorisObject 
-		var newPager = new CAN.Pager();
+		var newPager = new CAN.Pager(limit);
 		var newCanorisObject = new CAN.CanorisObject(inProperties);
 		//use jQuery.extend to let newPager inherited from newCanorisObjectl
 		$.extend(newPager, newCanorisObject);	
 		//save newFile, by using passed clossures 
-		savePager(newPager, limit);
+		savePager(newPager);
 		//run passed callback method	
 		if($.isFunction(succesCallback)){succesCallback(newPager); };
-	}, errorCallback, {page: pageNr});
+	}, errorCallback, {page: pageNr, limit: limit});
  }
  
  /**
@@ -519,21 +533,28 @@ CAN.Pager.prototype.prevNext = function(uri, succesCallback, errorCallback){
  
 /**
  * Function to get total files of the collection which the pager points to. 
- * @returns {Number} total_files Contains the total files.
+ * @returns {int} total_files Contains the total files.
  */
 CAN.Pager.prototype.getTotal = function(){
- 	if(this.properties.total_collections){
-		return this.properties.total_collections;	
-	} else if(this.properties.total_files){
-		return this.properties.total_files	
-	} else{ 
-		throw "Pager does not contain next page, not loaded or already at page 0.";
+ 	if( this.properties.total){
+		return this.properties.total;		
 	}
 }
- 
+
+/**
+ * Function to set the limit of items (files / collections) for one page
+ * @param {int} limit Contains the limit for the nr of items on one page
+ */
 CAN.Pager.prototype.setPageLimit = function(limit){
-	
-	
+	this.limit = limit;
+}
+
+/**
+ * Function to get the limit of items (files / collections) for one page
+ * @returns {int} limit Contains the limit for the nr of items on one page
+ */
+CAN.Pager.prototype.getPageLimit = function(){
+	return this.limit;	
 }
 
 
@@ -576,26 +597,33 @@ CAN.File.getFile = function(fKey, saveFile, succesCallback, errorCallback){
 }
 
 /**
- * Get analyses of File object and pass these to the passed callback method 
+ * Get analysis of File object and pass these to the passed callback method 
  * @param {int} showAll Contains 0 or 1. 0 -> get recommended descriptors, if 1 -> get all descriptors
- * @param {array} filter Contains Strings that contain names of wanted descriptor, to get corresponding analyses. See <a href="http://docs.canoris.com/howto_analysis.html" target="_blank">canoris_doc - howto_analysis</a>.
+ * @param {array} filter Contains Strings that contain names of wanted descriptor, to get corresponding analysis. See <a href="http://docs.canoris.com/howto_analysis.html" target="_blank">canoris_doc - howto_analysis</a>.
  * @param {function} succesCallback Will be called when the request succeeds.
- * @param {fucntion} errorCallback Will be called when the request fails
+ * @param {function} errorCallback Will be called when the request fails
  * (no XMLHttpRequest and specified error passed to errorCallback with use of jsonp)
  */
-CAN.File.prototype.getAnalyses = function(showAll, filter, succesCallback, errorCallback){
-	CAN.Log.log.debug("inside File.prototype.getAnalyses method " + 
+CAN.File.prototype.getAnalysis = function(perFrame, showAll, filter, succesCallback, errorCallback){
+	CAN.Log.log.debug("inside File.prototype.getAnalysis method " + 
 						"\n__showAll = " + showAll + "\nfilter = " + filter);
 	//if showAll is undefined -> set to 0
 	if (!showAll) { showAll = 0;};
 	//place showAll in object and save to params variable for request	
 	var params = {all: showAll};
+	//if perFrame -> no use of filter and use analysis_frames uri, otherwise use analysis uri
+	if(perFrame){ var uri = CAN._URI_FILE_ANALYSIS_FRAMES; filter = [""];} else{	var uri = CAN._URI_FILE_ANALYSIS};
 	//if filter is undefined -> set to array with one empty string
 	if (!filter) { 	filter = [""];}
-	//create request	
+	
+	//create request 	
 	CAN.RequestCreator.createGetReq(
-		CAN._uri(CAN._URI_FILE_ANALYSIS, [this.properties.key, filter.join("/")]), 
-		succesCallback, errorCallback, params
+		CAN._uri(uri, [this.properties.key, filter.join("/")]), 
+		function(analysis){ 
+			CAN.Log.log.debug("ANALYSIS RESPONSE: ")
+			CAN.Log.log.debug(CAN.Log.showObject(analysis));
+			succesCallback(analysis)
+		}, errorCallback, params
 	);
 }
 
@@ -706,7 +734,7 @@ CAN.Collection.getCollection = function(cKey, saveCollection, succesCallback, er
 
 /**
  * Show files that belong to collection
- * @param {number} pageNr Contains the collection page that is needed. 
+ * @param {Number} pageNr Contains the collection page that is needed. 
  */
 CAN.Collection.prototype.getFiles = function(pageNr, succesCallback, errorCallback){
 	if(isNaN(pageNr)){var page = {page: 0}} else {var page = {page: pageNr};};
