@@ -169,7 +169,7 @@
 			setTimeout( function( script , scriptAfter , timeoutTimer ) {
 				
 				if ( ! done ) {
-				
+					
 					// If a timeout is needed, install it
 					timeoutTimer = timeout > 0 && setTimeout( function() {
 						notifyError( STR_TIMEOUT );
@@ -205,6 +205,8 @@
 						( script[ STR_ONCLICK ] || noop )();
 						result = lastValue;
 						lastValue = undefined;
+						console.debug(result);
+						console.debug(result[0]);
 						result ? notifySuccess( result[ 0 ] ) : notifyError( STR_ERROR );
 					}
 										
