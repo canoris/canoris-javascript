@@ -160,7 +160,7 @@ var CAN = new function()
  */
 CAN.CanorisData = function(){};
 CAN.CanorisData.apiKey = false;
-CAN.CanorisData.baseUri = 'http://api.canoris.com';
+CAN.CanorisData.baseUri = 'http://api-test.canoris.com';
 
 /**
  * Set Api key method, checks if handed api_key exists and saves this to CanorisData.api_key
@@ -388,7 +388,11 @@ CAN.CanorisObject.prototype.update = function(succesCallback, errorCallback){
  * @constructor
  * @augments CAN.CanorisObject
  */
-CAN.Pager = function(){this.object = this;}
+CAN.Pager = function(limit){
+	this.object = this;
+	this.limit = limit;
+	console.debug(limit);
+}
 
 /**
  * Creates a files Pager object, saves it with passed pager-save function
@@ -399,8 +403,8 @@ CAN.Pager = function(){this.object = this;}
  * @param {fucntion} errorCallback Will be called when the request fails 
  * (no XMLHttpRequest and specified error passed to errorCallback with use of jsonp)
  */
-CAN.Pager.getFilesPager = function(savePager, pageNr, succesCallback, errorCallback){
- 	CAN.Pager.createPager(CAN._uri(CAN._URI_FILES), savePager, pageNr, succesCallback, errorCallback);
+CAN.Pager.getFilesPager = function(savePager, pageNr, limit, succesCallback, errorCallback){
+ 	CAN.Pager.createPager(CAN._uri(CAN._URI_FILES), savePager, pageNr, limit, succesCallback, errorCallback);
 }
  
 /**
@@ -412,8 +416,8 @@ CAN.Pager.getFilesPager = function(savePager, pageNr, succesCallback, errorCallb
  * @param {fucntion} errorCallback Will be called when the request fails 
  * (no XMLHttpRequest and specified error passed to errorCallback with use of jsonp)
  */
-CAN.Pager.getCollectionsPager = function(savePager, pageNr, succesCallback, errorCallback){
-	CAN.Pager.createPager(CAN._uri(CAN._URI_COLLECTIONS), savePager, pageNr, succesCallback, errorCallback);
+CAN.Pager.getCollectionsPager = function(savePager, pageNr, limit, succesCallback, errorCallback){
+	CAN.Pager.createPager(CAN._uri(CAN._URI_COLLECTIONS), savePager, pageNr, limit, succesCallback, errorCallback);
 }
  
  /**
@@ -426,8 +430,8 @@ CAN.Pager.getCollectionsPager = function(savePager, pageNr, succesCallback, erro
  * @param {fucntion} errorCallback Will be called when the request fails
  * (no XMLHttpRequest and specified error passed to errorCallback with use of jsonp)
  */
-CAN.Pager.getCollectionFilesPager = function(cKey, savePager, pageNr, succesCallback, errorCallback){
- 	CAN.Pager.createPager(CAN._uri(CAN._URI_COLLECTION_FILES, [cKey]), savePager, pageNr, succesCallback, errorCallback);
+CAN.Pager.getCollectionFilesPager = function(cKey, savePager, pageNr, limit, succesCallback, errorCallback){
+ 	CAN.Pager.createPager(CAN._uri(CAN._URI_COLLECTION_FILES, [cKey]), savePager, pageNr, limit, succesCallback, errorCallback);
 }
  	 
 /**
@@ -440,7 +444,7 @@ CAN.Pager.getCollectionFilesPager = function(cKey, savePager, pageNr, succesCall
  * @param {fucntion} errorCallback Will be called when the request fails
  * (no XMLHttpRequest and specified error passed to errorCallback with use of jsonp)
  */
-CAN.Pager.createPager = function(uri, savePager, pageNr, succesCallback, errorCallback){
+CAN.Pager.createPager = function(uri, savePager, pageNr, limit, succesCallback, errorCallback){
 	CAN.Log.log.debug(	"inside Pager.createPager method" + "\n__uri = " + uri + 
 						"\n__pageNr = " + pageNr + "\n__savePager = " + savePager);
 	//check if pageNr is passed, if not set pageNr to 0
@@ -453,7 +457,7 @@ CAN.Pager.createPager = function(uri, savePager, pageNr, succesCallback, errorCa
 		//use jQuery.extend to let newPager inherited from newCanorisObjectl
 		$.extend(newPager, newCanorisObject);	
 		//save newFile, by using passed clossures 
-		savePager(newPager);
+		savePager(newPager, limit);
 		//run passed callback method	
 		if($.isFunction(succesCallback)){succesCallback(newPager); };
 	}, errorCallback, {page: pageNr});
@@ -527,6 +531,10 @@ CAN.Pager.prototype.getTotal = function(){
 	}
 }
  
+CAN.Pager.prototype.setPageLimit = function(limit){
+	
+	
+}
 
 
 /*======================================================================*/

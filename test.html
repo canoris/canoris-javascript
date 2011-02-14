@@ -13,27 +13,30 @@
 	</head>
 	<body>
 		<script type="text/javascript">
-		$(document).ready(function(){
+			$(document).ready(function(){
 				
-			loadSettings();
-			
+			loadSettings();	
 			if(apiKey == "" && fileKey == "" && collectionKey == "")
 			{
 				$("#enterKeys").append(
 					"<br/><br/>" + 
-					"please enter apiKey, fileKey and collectionKey in source test.html" +
+					"please enter apiKey, fileKey and collectionKey in settings_local.js" +
 					"<br/><br/><br/>"
 				);
 				
 			}			
-			else{
-				
+			else {
 			/*======= canoris object ========*/
 				//creating canoris object
 				var canoris = new Canoris(apiKey, false, "ALL");
+			
+			
+				
+			
+			
 				
 				//create canoris object test	
-				test("create canoris Object test", function(){
+/*				test("create canoris Object test", function(){
 						ok($.type(canoris) == "object", "Canoris object created succesfull");
 				});
 			
@@ -43,23 +46,33 @@
 				
 				canoris.getFile(fileKey, "file1", function(file){
 					
-					module("File tests");
+/*					module("File tests");
 					//File.getFile test
 					test("File.getFile test", function() {
 						ok(	($.type(file) == "object" && file.properties),
 							"getFile test");
 					});
 					
-					//file.getAnalyses test
-					file.getAnalyses(1, ["highlevel","genre", "r"], function(analyses){
+					//file.getAnalyses test, getting main analysis and using filter
+					file.getAnalysis(false, 1, ["highlevel","genre", "r"], function(analysis){
 						module("File tests");
-						test("file.getAnalyses test the test", function(){
-							ok($.type(analyses) == "object" && analyses.all && analyses.all.classical, 
-								"file.getAnalyses passed the test");
+						test("file.getAnalyses test, getting main analysis and using filter", function(){
+							ok($.type(analysis) == "object" && analysis.all && analysis.all.classical, 
+								"file.getAnalyses test, getting main analysis and using filter");
 						});
-					}); 
-					 
-					
+					});
+*/					
+					//file.getAnalyses test, getting frames analysis
+					file.getAnalysis(true, 1, false, function(analysis){
+						console.debug("CALLBACK - getAnalysis !!!!!!!"); 
+						module("File tests");
+						test("file.getAnalyses test, getting frames analysis", function(){
+							ok($.type(analysis) == "object" && analysis.all && analysis.all.classical, 
+								"file.getAnalyses test, getting frames analysis");
+						});
+					});  
+				});					 
+			/*	for test api other url is used... skip test 	
 					//file.getFileUrl test
 					module("File tests");
 					test("file.getFileUrl test", function(){
@@ -68,17 +81,20 @@
 						"file.getFileUrl passed the test");
 								
 					})
+			*/
 					
-					//file.getVisualisations & file.getVisualisationUrl test
+/*					//file.getVisualisations & file.getVisualisationUrl test
 					file.getVisualisations(function(visualisations){
 						module("File tests");
 						test("file.getVisualisations test & file.getVisualisationUrl", function(){
 							ok(	$.type(visualisations) == "object" && visualisations.waveform && visualisations.spectrum, 
 								"file.getVisualisations passed the test"	);
+			/*	for test api other url is used... skip test 						
 							ok( file.getVisualisationUrl("spectrum") == 
 									"http://api.canoris.com/files/" + fileKey + "/visualizations/spectrum?&api_key=" + apiKey + "&format=json",
-								"file.getVisualisations passed the test")							
-						})
+								"file.getVisualisations passed the test")
+			*/							
+/*						})
 					});
 					//file.getConversions & file.getConversionUrl test
 					file.getConversions(function(conversions){
@@ -87,17 +103,19 @@
 							ok($.type(conversions) == "object" && conversions.mp3_128kb && conversions.mp3_64kb &&
 								conversions.ogg && conversions.wave_44100, 
 								"file.getConversions passed the test");
+			/*	for test api other url is used... skip test 					
 							ok( file.getConversionUrl("wave_44100") == 
 									"http://api.canoris.com/files/" + fileKey + "/conversions/wave_44100?&api_key=" + apiKey + "&format=json", 
 								"file.getConvserionUrl passed the test");
+			
 						});		
-					});
+					});*/
 					
-				});
+//				});
 				
 			/*======= Collection tests ========*/
 			//Collection.getCollection test				
-				canoris.getCollection(collectionKey, "collection1", function(collection){
+/*				canoris.getCollection(collectionKey, "collection1", function(collection){
 					module("Collection tests");
 					test("Collection.getCollection test", function() {
 						ok(	($.type(collection) == "object" && collection.properties),
@@ -108,7 +126,7 @@
 					collection.getFiles(1, function(page){
 						module("Collection tests");
 						test("collection.getFiles test", function(){
-							ok($.type(page)=="object" && page.ref && page.files, 
+							ok($.type(page)=="object" && page.ref && page.items, 
 							"collection.getFiles test");
 						});
 					}) 
@@ -137,7 +155,7 @@
 				
 			/*======= Pager tests ========*/		
 				//Pager.getFilesPager test
-				canoris.getFilesPager("myFilePager", 1, function(pager){
+/*				canoris.getFilesPager("myFilePager", 1, 10, function(pager){
 					module("Pager tests");
 					test("Pager.getFilesPager test", function(){
 						ok($.type(pager) == "object" && $.type(pager.getTotal) == "function" &&	
@@ -145,6 +163,7 @@
 							"Pager.getFilesPager test");
 					});
 					
+		
 					//pager.previous test
 					pager.previous(function(pager){
 						module("Pager tests");
@@ -162,32 +181,34 @@
 									"pager.next test");
 							});
 						
-							//pager.update test
+							//pager.update test & pager.setPageLimit & pager.getPageLimit
+							pager.setPageLimit(15);
 							pager.update(function(pager){
 								module("Pager tests");
-								test("pager.update test", function(){
+								test("pager.update test & Pager.setPageLimit and pager.getPageLimit test", function(){
 									ok($.type(pager) == "object" && $.type(pager.getTotal) == "function" &&	
 										!isNaN(pager.getTotal()) && pager.properties.previous,  
 										"pager.update test");
+									ok(pager.getPageLimit() == 15, "pager.setPageLimit and Pager.getPageLimit test")	
 								});
-							});
-						});	
-					});	
-					
-				});
+							});//end pager.update callback
+						});	//end pager.next callback
+					});	//end pager.previous callback
+				});//end Pager.getPager callback
 				
 				//Pager.getCollectionsPager test
-				canoris.getCollectionsPager("myCollectionsPager", 1, function(pager){
+				canoris.getCollectionsPager("myCollectionsPager", 1, 10, function(pager){
 					module("Pager tests");
-					test("Pager.myCollectionsPager test", function(){
+					
+						test("Pager.myCollectionsPager test", function(){
 						ok($.type(pager) == "object" && $.type(pager.getTotal) == "function" &&	
-							!isNaN(pager.getTotal()) && pager.properties.previous,  
+							!isNaN(pager.getTotal()) &&	pager.properties.previous,  
 							"Pager.myCollectionsPager test");
 					});
 				});
 					
 				//Pager.getCollectionFilesPager test
-				canoris.getCollectionFilesPager(collectionKey, "myCollectionFilesPager", 1, function(pager){
+				canoris.getCollectionFilesPager(collectionKey, "myCollectionFilesPager", 1, 10, function(pager){
 					module("Pager tests");
 					test("Pager.getCollectionFilesPager test", function(){
 						ok($.type(pager) == "object" && $.type(pager.getTotal) == "function" &&	
@@ -204,8 +225,10 @@
 							"Text2Phonemes.text2phonemes test");
 					});
 				});
+*/				
 			}
-		});
+			});
+		
 		</script>
 		
 		<h1 id="qunit-header">Test CanorisLibJs</h1>
