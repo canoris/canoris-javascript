@@ -247,8 +247,6 @@ CAN.RequestCreator.setUseJson = function(json){
  */
 CAN.RequestCreator.standardErrorMethod = function(XMLHttpRequest, textStatus, errorThrown){	
 	CAN.Log.log.error( "Request failed, request = \n" + CAN.Log.showObject(XMLHttpRequest) + 
-						"\nerror of Request =  " + textStatus +	"\nthrown error =  " + errorThrown); 
-	CAN.Log.log.error( "Request failed, request = \n" + CAN.Log.showObject(XMLHttpRequest) + 
 						"\nerror of Request =  " + textStatus + "\nthrown error =  " + errorThrown); 
 	throw new Error("RequestCreator error, request didn't succeed. " + errorThrown);
 };
@@ -316,6 +314,48 @@ CAN.RequestCreator.createGetReq = function(uri, succesCallback, errorCallback, p
 		});*/
 	}
 }	
+
+CAN.RequestCreator.createPostReq = function(uri, succesCallback, errorCallback, params){
+	if(CAN.RequestCreator.useJson){
+		CAN.Log.log.debug(	"inside RequestCreator.createPostReq, passed args:" +
+							"\n__uri: " + uri + 
+							"\n__succesCallback is: " + succesCallback + 
+							"\n__errorCallback is: " + errorCallback + 
+		 					"\n__parameters: " + CAN.Log.showObject(params));
+		//get api key, needed to create a request	
+		var aKey = CAN.CanorisData.getApiKey();
+		//create parameter object, with api key and passed paramameters
+		var dataParams = {api_key: aKey};
+		//if params are passed, extend dataParams with params
+		if (params) { $.extend(dataParams, params); };
+		//check if errorCallback is a function, 
+		//if not -> use standard error method, else combine standard errorCallback with passed errorcallback
+		if(!$.isFunction(errorCallback)){	
+			var errorCallback = CAN.RequestCreator.standardErrorMethod;
+		} else {
+			var errorCallback = function(XMLHttpRequest, textStatus, errorThrown){
+				CAN.RequestCreator.standardErrorMethod(XMLHttpRequest, textStatus, errorThrown);
+				errorCallback(XMLHttpRequest, textStatus, errorThrown);
+			};
+		}; 
+		
+		//send a json XMLHttpRequest 
+		$.ajax({
+			url: uri,
+			dataType: 'json',
+			data: dataParams,
+			success: succesCallback,
+			error: errorCallback,
+			type: 'POST'
+		});
+	} else{
+		
+		CAN.Log.log.error( "Post Request failed because post is only possible while using json, " + 
+								" by using canoris javascript lib from canoris server") 
+		throw new Error("Post Request failed because post is only possible while using json, " + 
+								" by using canoris javascript lib from canoris server")
+	};	
+}
 
 
 /*======================================================================*/
@@ -595,6 +635,22 @@ CAN.File.getFile = function(fKey, saveFile, succesCallback, errorCallback){
 	}, errorCallback);
 
 }
+
+CAN.File.postFileHttp = function(fileAdress, succesCallback, errorCallback){
+	CAN.RequestCreator.createPostReq(CAN._uri(CAN._URI_FILES), function(inProperties)
+	{
+		//create a new File object and a new CanorisObject 
+		var newFile = new CAN.File();
+		var newCanorisObject = new CAN.CanorisObject(inProperties);
+		//use jQuery.extend to let newFile inherited from newCanorisObjectl
+		$.extend(newFile, newCanorisObject);	
+		//save newFile, by using passed clossures 
+		saveFile(newFile);		
+		//call succesCallback method
+		if($.isFunction(succesCallback)){succesCallback(newFile); };
+	}, errorCallbackm, fileAdress);	
+}
+	 
 
 /**
  * Get analysis of File object and pass these to the passed callback method 
@@ -878,6 +934,7 @@ Canoris = function(aKey, useJson, levelConsoleLog, levelServerLog, serverLogAddr
 				
 				files: files,
 				getFile: getFile, 
+				postFileHttp: postFileHttp,
 
 				collections: collections,
 				getCollection: getCollection,

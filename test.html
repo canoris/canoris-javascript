@@ -28,7 +28,7 @@
 			else {
 			/*======= canoris object ========*/
 				//creating canoris object
-				var canoris = new Canoris(apiKey, false, "ALL");
+				var canoris = new Canoris(apiKey, true, "ALL");
 			
 			
 				
@@ -43,8 +43,15 @@
 			
 			/*======= File tests ========*/
 				module("File tests");
+								
+				canoris.postFileHttp("http://student-kmt.hku.nl/~ciska/songs/moricone.mp3", 
+					function(file){
+						console.debug("inside callback postFileHttp")
+						console.debug(file)
+					}
+				}); 		
 				
-				canoris.getFile(fileKey, "file1", function(file){
+//				canoris.getFile(fileKey, "file1", function(file){
 					
 /*					module("File tests");
 					//File.getFile test
@@ -62,7 +69,7 @@
 						});
 					});
 */					
-					//file.getAnalyses test, getting frames analysis
+/*					//file.getAnalyses test, getting frames analysis
 					file.getAnalysis(true, 1, false, function(analysis){
 						console.debug("CALLBACK - getAnalysis !!!!!!!"); 
 						module("File tests");
@@ -71,8 +78,10 @@
 								"file.getAnalyses test, getting frames analysis");
 						});
 					});  
-				});					 
-			/*	for test api other url is used... skip test 	
+				});		
+				
+*/						
+				/*	for test api other url is used... skip test 	
 					//file.getFileUrl test
 					module("File tests");
 					test("file.getFileUrl test", function(){
