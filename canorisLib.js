@@ -911,7 +911,7 @@ Canoris = function(aKey, useJson, levelConsoleLog, levelServerLog, serverLogAddr
 			{	CAN.File.getFile(fKey, saveFile(nameFile), succesCallback, errorCallback); };
 			
 			//postFileHttp function to call CAN.File.postFileHttp with files clossure function
-			var postFileHttp = function(fileAdress, saveFile, succesCallback, errorCallback)
+			var postFileHttp = function(fileAdress, nameFile, succesCallback, errorCallback)
 			{	CAN.File.postFileHttp(fileAdress, saveFile(nameFile), succesCallback, errorCallback); };
 			
 			
