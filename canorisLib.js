@@ -875,9 +875,10 @@ Canoris = function(aKey, useJson, levelConsoleLog, levelServerLog, serverLogAddr
 		if (aKey) {
 			
 			//set use of json, logAddress and loggers levels
+			CAN.Log.setLogger(levelConsoleLog, levelServerLog);
 			CAN.RequestCreator.setUseJson(useJson);
 			CAN.Log.setLogAddress(serverLogAddress);	
-			CAN.Log.setLogger(levelConsoleLog, levelServerLog);
+			
 					
 			//empty pagers object, will be ued to hold pagers
 			var pagers = {};
