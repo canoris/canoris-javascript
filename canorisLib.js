@@ -636,7 +636,7 @@ CAN.File.getFile = function(fKey, saveFile, succesCallback, errorCallback){
 
 }
 
-CAN.File.postFileHttp = function(fileAdress, succesCallback, errorCallback){
+CAN.File.postFileHttp = function(fileAdress, saveFile, succesCallback, errorCallback){
 	CAN.RequestCreator.createPostReq(CAN._uri(CAN._URI_FILES), function(inProperties)
 	{
 		//create a new File object and a new CanorisObject 
@@ -648,7 +648,7 @@ CAN.File.postFileHttp = function(fileAdress, succesCallback, errorCallback){
 		saveFile(newFile);		
 		//call succesCallback method
 		if($.isFunction(succesCallback)){succesCallback(newFile); };
-	}, errorCallbackm, fileAdress);	
+	}, errorCallback, fileAdress);	
 }
 	 
 
@@ -909,6 +909,11 @@ Canoris = function(aKey, useJson, levelConsoleLog, levelServerLog, serverLogAddr
 			//getFile function to call CAN.File.getFile with files clossure function
 			var getFile = function(fKey, nameFile, succesCallback, errorCallback)
 			{	CAN.File.getFile(fKey, saveFile(nameFile), succesCallback, errorCallback); };
+			
+			//postFileHttp function to call CAN.File.postFileHttp with files clossure function
+			var postFileHttp = function(fileAdress, saveFile, succesCallback, errorCallback)
+			{	CAN.File.postFileHttp(fileAdress, saveFile(nameFile), succesCallback, errorCallback); };
+			
 			
 			//empty collections object, will be used to hold collections 
 			var collections = {};
